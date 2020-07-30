@@ -43,6 +43,7 @@ func eventHandler(event chan *docker.APIEvents, wg *sync.WaitGroup, client *dock
 						if k == "swarmlet.domains" {
 							fmt.Println("Running lego for domains " + v)
 							// TODO: Call lego here
+							// TODO: Inject Traefik TLS labels into service
 						}
 					}
 				}
