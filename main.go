@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"sync"
 
 	docker "github.com/fsouza/go-dockerclient"
@@ -22,6 +21,7 @@ func main() {
 	_, err := os.Stat("./lego")
 	if err != nil {
 		fmt.Println("Missing ./lego binary!")
+		os.Exit(1)
 	}
 	path, err := os.Getwd()
 	check(err)
@@ -57,10 +57,7 @@ func eventHandler(event chan *docker.APIEvents, wg *sync.WaitGroup, client *dock
 					_, ok3 := service.Spec.Labels["swarmlet.lego.agreetos"]
 					if ok && ok2 && ok3 && !isDone {
 						// Run Lego
-						legoCmd := exec.Command("./lego", "--path", legoOutputFolder, "-a", "--server", acmeEndpoint, "--email", email, "--domains", domains, "--http", "run")
-						legoCmd.Stdout = os.Stdout
-						legoCmd.Stderr = os.Stderr
-						err := legoCmd.Run()
+						runLego(acmeEndpoint, email, domains)
 						if err != nil {
 							fmt.Printf("Swarmlet Lego: Lego error %v", err)
 							continue
@@ -79,7 +76,7 @@ func eventHandler(event chan *docker.APIEvents, wg *sync.WaitGroup, client *dock
 					} else if isDone {
 						fmt.Printf("Skipping post-lego Docker event (label swarmlet.lego._done is present)")
 					} else {
-						fmt.Printf("Skipping not applicable service")
+						fmt.Printf("Skipping not applicable Docker service")
 					}
 				}
 			}
@@ -89,4 +86,13 @@ func eventHandler(event chan *docker.APIEvents, wg *sync.WaitGroup, client *dock
 			return
 		}
 	}
+}
+
+func runLego(acmeEndpoint, email, domains string) error {
+	/*legoCmd := exec.Command("./lego", "--path", legoOutputFolder, "-a", "--server", acmeEndpoint, "--email", email, "--domains", domains, "--http", "run")
+	legoCmd.Stdout = os.Stdout
+	legoCmd.Stderr = os.Stderr
+	err := legoCmd.Run()
+	return err*/
+	return nil
 }
